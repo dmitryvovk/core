@@ -85,15 +85,21 @@ trait HashIdTrait
         return $result;
     }
 
-    public function decode(?string $id): array | string
+    public function decode(?string $id): ?int
     {
         // Check if passed as null, (could be an optional decodable variable)
         if (is_null($id) || strtolower($id) === 'null') {
             return $id;
         }
 
+        $value = $this->decoder($id);
+
+        if (empty($value)) {
+            return null;
+        }
+
         // Do the decoding if the ID looks like a hashed one
-        return empty($this->decoder($id)) ? [] : $this->decoder($id)[0];
+        return (int)$value[0];
     }
 
     /**
@@ -174,7 +180,7 @@ trait HashIdTrait
      *
      * @param array|null $keysTodo
      *
-     * @return array|string|null
+     * @return array|int|null
      */
     private function processField($data, $keysTodo)
     {
