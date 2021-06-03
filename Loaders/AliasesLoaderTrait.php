@@ -19,6 +19,8 @@ trait AliasesLoaderTrait
     /**
      * @param $aliasKey
      * @param $aliasValue
+     *
+     * @return void
      */
     private function loadAlias($aliasKey, $aliasValue)
     {

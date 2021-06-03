@@ -2,40 +2,37 @@
 
 namespace Apiato\Core\Abstracts\Requests;
 
+use Apiato\Core\Abstracts\Models\UserModel as User;
+use Apiato\Core\Abstracts\Transporters\Transporter;
+use Apiato\Core\Exceptions\UndefinedTransporterException;
 use Apiato\Core\Traits\HashIdTrait;
 use Apiato\Core\Traits\SanitizerTrait;
 use Apiato\Core\Traits\StateKeeperTrait;
-use Illuminate\Support\Facades\App;
-use Apiato\Core\Abstracts\Models\UserModel as User;
 use Illuminate\Foundation\Http\FormRequest as LaravelRequest;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 
 /**
- * Class Request
+ * Class Request.
  *
  * A.K.A (app/Http/Requests/Request.php)
- *
- * @author  Mahmoud Zalt  <mahmoud@zalt.me>
  */
 abstract class Request extends LaravelRequest
 {
     use HashIdTrait;
-    use StateKeeperTrait;
     use SanitizerTrait;
+    use StateKeeperTrait;
+
+    /**
+     * The transporter to be "casted" to.
+     */
+    protected ?string $transporter = null;
 
     /**
      * To be used mainly from unit tests.
-     *
-     * @param array $parameters
-     * @param User|null $user
-     * @param array $cookies
-     * @param array $files
-     * @param array $server
-     *
-     * @return  static
      */
-    public static function injectData($parameters = [], User $user = null, $cookies = [], $files = [], $server = [])
+    public static function injectData(array $parameters = [], ?User $user = null, array $cookies = [], array $files = [], array $server = []): self
     {
         // if user is passed, will be returned when asking for the authenticated user using `\Auth::user()`
         if ($user) {
@@ -47,23 +44,17 @@ abstract class Request extends LaravelRequest
         // For now doesn't matter which URI or Method is used.
         $request = parent::create('/', 'GET', $parameters, $cookies, $files, $server);
 
-        $request->setUserResolver(function () use ($user) {
-            return $user;
-        });
+        $request->setUserResolver(static fn () => $user);
 
         return $request;
     }
 
     /**
-     * check if a user has permission to perform an action.
+     * Check if a user has permission to perform an action.
      * User can set multiple permissions (separated with "|") and if the user has
      * any of the permissions, he will be authorize to proceed with this action.
-     *
-     * @param User|null $user
-     *
-     * @return  bool
      */
-    public function hasAccess(User $user = null)
+    public function hasAccess(?User $user = null): bool
     {
         // if not in parameters, take from the request object {$this}
         $user = $user ?: $this->user();
@@ -73,6 +64,7 @@ abstract class Request extends LaravelRequest
             // there are some roles defined that will automatically grant access
             if (!empty($autoAccessRoles)) {
                 $hasAutoAccessByRole = $user->hasAnyRole($autoAccessRoles);
+
                 if ($hasAutoAccessByRole) {
                     return true;
                 }
@@ -91,10 +83,8 @@ abstract class Request extends LaravelRequest
 
     /**
      * @param $user
-     *
-     * @return  array
      */
-    private function hasAnyPermissionAccess($user)
+    private function hasAnyPermissionAccess($user): array
     {
         if (!array_key_exists('permissions', $this->access) || !$this->access['permissions']) {
             return [];
@@ -103,20 +93,13 @@ abstract class Request extends LaravelRequest
         $permissions = is_array($this->access['permissions']) ? $this->access['permissions'] :
             explode('|', $this->access['permissions']);
 
-        $hasAccess = array_map(function ($permission) use ($user) {
-            // Note: internal return
-            return $user->hasPermissionTo($permission);
-        }, $permissions);
-
-        return $hasAccess;
+        return array_map(static fn ($permission) => $user->hasPermissionTo($permission), $permissions);
     }
 
     /**
      * @param $user
-     *
-     * @return  array
      */
-    private function hasAnyRoleAccess($user)
+    private function hasAnyRoleAccess($user): array
     {
         if (!array_key_exists('roles', $this->access) || !$this->access['roles']) {
             return [];
@@ -125,24 +108,16 @@ abstract class Request extends LaravelRequest
         $roles = is_array($this->access['roles']) ? $this->access['roles'] :
             explode('|', $this->access['roles']);
 
-        $hasAccess = array_map(function ($role) use ($user) {
-            // Note: internal return
-            return $user->hasRole($role);
-        }, $roles);
-
-        return $hasAccess;
+        return array_map(static fn ($role) => $user->hasRole($role), $roles);
     }
 
     /**
      * Maps Keys in the Request.
-     *
      * For example, ['data.attributes.name' => 'firstname'] would map the field [data][attributes][name] to [firstname].
      * Note that the old value (data.attributes.name) is removed the original request - this method manipulates the request!
      * Be sure you know what you do!
-     *
-     * @param array $fields
      */
-    public function mapInput(array $fields)
+    public function mapInput(array $fields): void
     {
         $data = $this->all();
 
@@ -166,31 +141,22 @@ abstract class Request extends LaravelRequest
      * applying the validation rules.
      *
      * @param null $keys
-     *
-     * @return  array
      */
-    public function all($keys = null)
+    public function all($keys = null): array
     {
         $requestData = parent::all($keys);
 
         $requestData = $this->mergeUrlParametersWithRequestData($requestData);
 
-        $requestData = $this->decodeHashedIdsBeforeValidation($requestData);
-
-        return $requestData;
+        return $this->decodeHashedIdsBeforeValidation($requestData);
     }
 
     /**
      * apply validation rules to the ID's in the URL, since Laravel
      * doesn't validate them by default!
-     *
-     * Now you can use validation rules like this: `'id' => 'required|integer|exists:items,id'`
-     *
-     * @param array $requestData
-     *
-     * @return  array
+     * Now you can use validation rules like this: `'id' => 'required|integer|exists:items,id'`.
      */
-    private function mergeUrlParametersWithRequestData(array $requestData)
+    private function mergeUrlParametersWithRequestData(array $requestData): array
     {
         if (isset($this->urlParameters) && !empty($this->urlParameters)) {
             foreach ($this->urlParameters as $param) {
@@ -202,12 +168,10 @@ abstract class Request extends LaravelRequest
     }
 
     /**
-     * This method mimics the $request->input() method but works on the "decoded" values
+     * This method mimics the $request->input() method but works on the "decoded" values.
      *
      * @param $key
      * @param $default
-     *
-     * @return mixed
      */
     public function getInputByKey($key = null, $default = null)
     {
@@ -218,18 +182,15 @@ abstract class Request extends LaravelRequest
      * Used from the `authorize` function if the Request class.
      * To call functions and compare their bool responses to determine
      * if the user can proceed with the request or not.
-     *
-     * @param array $functions
-     *
-     * @return  bool
      */
-    protected function check(array $functions)
+    protected function check(array $functions): bool
     {
         $orIndicator = '|';
-        $returns = [];
+        $returns     = [];
 
         // iterate all functions in the array
         foreach ($functions as $function) {
+
             // in case the value doesn't contains a separator (single function per key)
             if (!strpos($function, $orIndicator)) {
                 // simply call the single function and store the response.
@@ -255,5 +216,31 @@ abstract class Request extends LaravelRequest
         // if in_array returned `false` means all functions returned `true` thus return `true` to allow access.
         // return the final boolean
         return in_array(false, $returns) ? false : true;
+    }
+
+    /**
+     * Returns the Transporter (if correctly set).
+     *
+     * @throws UndefinedTransporterException
+     */
+    public function getTransporter(): string
+    {
+        if ($this->transporter === null) {
+            throw new UndefinedTransporterException();
+        }
+
+        return $this->transporter;
+    }
+
+    /**
+     * Transforms the Request into a specified Transporter class.
+     *
+     * @psalm-return Transporter
+     */
+    public function toTransporter()
+    {
+        $transporterClass = $this->getTransporter();
+
+        return new $transporterClass($this);
     }
 }

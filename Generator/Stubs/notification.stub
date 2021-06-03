@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Notifications;
 
 use App\Ship\Parents\Notifications\Notification;
@@ -11,7 +13,7 @@ class {{class-name}} extends Notification
         // ..
     }
 
-    public function toArray($notifiable)
+    public function toArray(mixed $notifiable): array
     {
         return [
             // ...

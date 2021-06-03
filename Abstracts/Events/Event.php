@@ -9,6 +9,8 @@ use Illuminate\Queue\SerializesModels;
 
 abstract class Event
 {
+    use Dispatchable;
+    use InteractsWithSockets;
     use JobProperties;
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use SerializesModels;
 }

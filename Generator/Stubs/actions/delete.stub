@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Actions;
 
+use App\Containers\{{section-name}}\{{container-name}}\Data\Transporters\Delete{{model}}Transporter;
 use App\Containers\{{section-name}}\{{container-name}}\Tasks\Delete{{model}}Task;
 use App\Ship\Parents\Actions\Action;
-use App\Ship\Parents\Requests\Request;
 
 class Delete{{model}}Action extends Action
 {
-    public function run(Request $request)
+    public function run(Delete{{model}}Transporter ${{entity}}Data): bool
     {
-        return app(Delete{{model}}Task::class)->run($request->id);
+        return app(Delete{{model}}Task::class)->run(${{entity}}Data->id);
     }
 }

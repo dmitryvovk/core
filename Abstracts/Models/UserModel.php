@@ -11,10 +11,10 @@ use Spatie\Permission\Traits\HasRoles;
 
 abstract class UserModel extends LaravelAuthenticatableUser
 {
+    use FactoryLocatorTrait, HasFactory {
+        FactoryLocatorTrait::newFactory insteadof HasFactory;
+    }
     use HashIdTrait;
     use HasResourceKeyTrait;
     use HasRoles;
-    use HasFactory, FactoryLocatorTrait {
-        FactoryLocatorTrait::newFactory insteadof HasFactory;
-    }
 }

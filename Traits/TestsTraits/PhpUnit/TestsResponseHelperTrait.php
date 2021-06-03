@@ -5,6 +5,11 @@ namespace Apiato\Core\Traits\TestsTraits\PhpUnit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+/**
+ * Class TestsResponseHelperTrait.
+ *
+ * Tests helper for making formatting and asserting http responses.
+ */
 trait TestsResponseHelperTrait
 {
     public function assertResponseContainKeys($keys): void
@@ -16,22 +21,8 @@ trait TestsResponseHelperTrait
         $arrayResponse = $this->removeDataKeyFromResponse($this->getResponseContentArray());
 
         foreach ($keys as $key) {
-            $this->assertTrue(array_key_exists($key, $arrayResponse));
+            self::assertTrue(array_key_exists($key, $arrayResponse));
         }
-    }
-
-    /**
-     * @param array $responseContent
-     *
-     * @return  array|mixed
-     */
-    private function removeDataKeyFromResponse(array $responseContent)
-    {
-        if (array_key_exists('data', $responseContent)) {
-            return $responseContent['data'];
-        }
-
-        return $responseContent;
     }
 
     public function assertResponseContainValues($values): void
@@ -43,7 +34,7 @@ trait TestsResponseHelperTrait
         $arrayResponse = $this->removeDataKeyFromResponse($this->getResponseContentArray());
 
         foreach ($values as $value) {
-            $this->assertTrue(in_array($value, $arrayResponse));
+            self::assertTrue(in_array($value, $arrayResponse));
         }
     }
 
@@ -54,8 +45,17 @@ trait TestsResponseHelperTrait
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
             $expected = $this->formatToExpectedJson($key, $value);
-            $this->assertTrue(Str::contains($httpResponse, $expected),
+            self::assertTrue(Str::contains($httpResponse, $expected),
                 "The JSON fragment [ {$expected} ] does not exist in the response [ {$httpResponse} ].");
+        }
+    }
+
+    public function assertValidationErrorContain(array $messages): void
+    {
+        $responseContent = $this->getResponseContentObject();
+
+        foreach ($messages as $key => $value) {
+            self::assertEquals($responseContent->errors->{$key}[0], $value);
         }
     }
 
@@ -74,12 +74,12 @@ trait TestsResponseHelperTrait
         return trim($expected);
     }
 
-    public function assertValidationErrorContain(array $messages): void
+    private function removeDataKeyFromResponse(array $responseContent): array
     {
-        $responseContent = $this->getResponseContentObject();
-
-        foreach ($messages as $key => $value) {
-            $this->assertEquals($responseContent->errors->{$key}[0], $value);
+        if (array_key_exists('data', $responseContent)) {
+            return $responseContent['data'];
         }
+
+        return $responseContent;
     }
 }

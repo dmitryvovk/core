@@ -1,25 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Events\Events;
 
-use App\Ship\Parents\Events\Event;
 use App\Containers\{{section-name}}\{{container-name}}\Models\{{model}};
 use Illuminate\Queue\SerializesModels;
+use App\Ship\Parents\Events\Event;
 
 class {{class-name}} extends Event
 {
     use SerializesModels;
 
-    public {{model}} $entity;
-
-    /**
-     * {{class-name}} constructor.
-     *
-     * @param $entity
-     */
-    public function __construct($entity)
+    public function __construct(public {{model}} $entity)
     {
-        $this->entity = $entity;
     }
 
     /**

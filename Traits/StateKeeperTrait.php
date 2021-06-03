@@ -19,7 +19,7 @@ trait StateKeeperTrait
         return $this;
     }
 
-    public function retrieve($key)
+    public function retrieve(string $key): mixed
     {
         return $this->stateKeeperStates[$key];
     }

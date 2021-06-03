@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\File;
  */
 trait SeederLoaderTrait
 {
-    protected $seedersPath = '/Data/Seeders';
+    /**
+     * Default seeders directory for containers and port.
+     */
+    protected string $seedersPath = '/Data/Seeders';
 
     public function runLoadingSeeders(): void
     {
@@ -32,7 +35,7 @@ trait SeederLoaderTrait
             }
         }
 
-        $seedersClasses = $this->findSeedersClasses($containersDirectories, $seedersClasses);
+        $seedersClasses       = $this->findSeedersClasses($containersDirectories, $seedersClasses);
         $orderedSeederClasses = $this->sortSeeders($seedersClasses);
 
         $this->loadSeeders($orderedSeederClasses);
@@ -46,6 +49,7 @@ trait SeederLoaderTrait
 
                 foreach ($files as $seederClass) {
                     if (File::isFile($seederClass)) {
+
                         // do not seed the classes now, just store them in a collection and w
                         $seedersClasses->push(
                             Apiato::getClassFullNameFromFile(
@@ -68,8 +72,8 @@ trait SeederLoaderTrait
         }
 
         foreach ($seedersClasses as $key => $seederFullClassName) {
-            // if the class full namespace contain "_" it means it needs to be seeded in order
-            if (false !== strpos($seederFullClassName, "_")) {
+            // if the class full namespace contain '_' it means it needs to be seeded in order
+            if (str_contains($seederFullClassName, '_')) {
                 // move all the seeder classes that needs to be seeded in order to their own Collection
                 $orderedSeederClasses->push($seederFullClassName);
                 // delete the moved classes from the original collection
@@ -78,10 +82,8 @@ trait SeederLoaderTrait
         }
 
         // sort the classes that needed to be ordered
-        $orderedSeederClasses = $orderedSeederClasses->sortBy(function ($seederFullClassName) {
-            // get the order number form the end of each class name
-            return substr($seederFullClassName, strpos($seederFullClassName, "_") + 1);
-        });
+        // get the order number form the end of each class name
+        $orderedSeederClasses = $orderedSeederClasses->sortBy(static fn ($seederFullClassName) => substr($seederFullClassName, strpos($seederFullClassName, '_') + 1));
 
         // append the randomly ordered seeder classes to the end of the ordered seeder classes
         foreach ($seedersClasses as $seederClass) {

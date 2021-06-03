@@ -7,17 +7,17 @@ use Apiato\Core\Foundation\Facades\Apiato;
 trait AutoLoaderTrait
 {
     // Using each component loader trait
+    use AliasesLoaderTrait;
     use ConfigsLoaderTrait;
+    use ConsolesLoaderTrait;
+    use HelpersLoaderTrait;
     use LocalizationLoaderTrait;
     use MigrationsLoaderTrait;
-    use ViewsLoaderTrait;
     use ProvidersLoaderTrait;
-    use ConsolesLoaderTrait;
-    use AliasesLoaderTrait;
-    use HelpersLoaderTrait;
+    use ViewsLoaderTrait;
 
     /**
-     * To be used from the `boot` function of the main service provider
+     * To be used from the `boot` function of the main service provider.
      */
     public function runLoadersBoot(): void
     {

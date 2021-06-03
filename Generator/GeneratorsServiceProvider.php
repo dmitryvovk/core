@@ -11,6 +11,7 @@ use Apiato\Core\Generator\Commands\ControllerGenerator;
 use Apiato\Core\Generator\Commands\EventGenerator;
 use Apiato\Core\Generator\Commands\EventHandlerGenerator;
 use Apiato\Core\Generator\Commands\ExceptionGenerator;
+use Apiato\Core\Generator\Commands\FactoryGenerator;
 use Apiato\Core\Generator\Commands\JobGenerator;
 use Apiato\Core\Generator\Commands\MailGenerator;
 use Apiato\Core\Generator\Commands\MigrationGenerator;
@@ -28,6 +29,7 @@ use Apiato\Core\Generator\Commands\TestFunctionalTestGenerator;
 use Apiato\Core\Generator\Commands\TestTestCaseGenerator;
 use Apiato\Core\Generator\Commands\TestUnitTestGenerator;
 use Apiato\Core\Generator\Commands\TransformerGenerator;
+use Apiato\Core\Generator\Commands\TransporterGenerator;
 use Apiato\Core\Generator\Commands\ValueGenerator;
 use Illuminate\Support\ServiceProvider;
 
@@ -75,21 +77,20 @@ class GeneratorsServiceProvider extends ServiceProvider
             TaskGenerator::class,
             TransformerGenerator::class,
             ValueGenerator::class,
+            TransporterGenerator::class,
+            FactoryGenerator::class,
         ]);
     }
 
     /**
      * Register the generators.
-     * @param array $classes
      */
     private function registerGenerators(array $classes): void
     {
         foreach ($classes as $class) {
             $lowerClass = strtolower($class);
 
-            $this->app->singleton("command.porto.$lowerClass", function ($app) use ($class) {
-                return $app[$class];
-            });
+            $this->app->singleton("command.porto.$lowerClass", fn ($app) => $app[$class]);
 
             $this->commands("command.porto.$lowerClass");
         }

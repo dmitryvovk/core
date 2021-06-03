@@ -8,6 +8,9 @@ use Illuminate\Events\EventServiceProvider as BaseEventServiceProvider;
 
 class EventServiceProvider extends BaseEventServiceProvider
 {
+    /**
+     * @inheritDoc
+     */
     public function register()
     {
         $this->app->singleton('events', function ($app) {

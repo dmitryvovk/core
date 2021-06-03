@@ -4,7 +4,6 @@ namespace Apiato\Core\Abstracts\Transformers;
 
 use Apiato\Core\Exceptions\CoreInternalErrorException;
 use Apiato\Core\Exceptions\UnsupportedFractalIncludeException;
-use ErrorException;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
@@ -20,8 +19,6 @@ abstract class Transformer extends FractalTransformer
     /**
      * @param $adminResponse
      * @param $clientResponse
-     *
-     * @return  array
      */
     public function ifAdmin($adminResponse, $clientResponse): array
     {
@@ -34,20 +31,15 @@ abstract class Transformer extends FractalTransformer
         return $clientResponse;
     }
 
-    /**
-     * @return  Authenticatable|null
-     */
     public function user(): ?Authenticatable
     {
         return Auth::user();
     }
 
     /**
-     * @param mixed $data
-     * @param callable|FractalTransformer $transformer
-     * @param null $resourceKey
-     *
-     * @return Item
+     * @psalm-param mixed                       $data
+     * @psalm-param callable|FractalTransformer $transformer
+     * @psalm-param null|string                 $resourceKey
      */
     public function item($data, $transformer, $resourceKey = null): Item
     {
@@ -60,11 +52,9 @@ abstract class Transformer extends FractalTransformer
     }
 
     /**
-     * @param mixed $data
-     * @param callable|FractalTransformer $transformer
-     * @param null $resourceKey
-     *
-     * @return Collection
+     * @psalm-param mixed                       $data
+     * @psalm-param callable|FractalTransformer $transformer
+     * @psalm-param null|string                 resourceKey
      */
     public function collection($data, $transformer, $resourceKey = null): Collection
     {
@@ -77,23 +67,20 @@ abstract class Transformer extends FractalTransformer
     }
 
     /**
-     * @param Scope $scope
      * @param string $includeName
-     * @param mixed $data
      *
-     * @return ResourceInterface|bool
      * @throws CoreInternalErrorException
      * @throws UnsupportedFractalIncludeException
+     * @noinspection PhpInternalEntityUsedInspection
      */
-    protected function callIncludeMethod(Scope $scope, $includeName, $data)
+    protected function callIncludeMethod(Scope $scope, $includeName, $data): ResourceInterface
     {
         try {
             return parent::callIncludeMethod($scope, $includeName, $data);
-        } catch (ErrorException $exception) {
+        } catch (Exception $exception) {
             if (Config::get('apiato.requests.force-valid-includes', true)) {
                 throw new UnsupportedFractalIncludeException($exception->getMessage());
             }
-        } catch (Exception $exception) {
             throw new CoreInternalErrorException($exception->getMessage());
         }
     }

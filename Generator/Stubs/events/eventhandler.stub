@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Events\Handlers;
 
 use App\Containers\{{section-name}}\{{container-name}}\Events\Events\{{model}};
@@ -11,7 +13,7 @@ class {{class-name}} implements ShouldQueue
     {
     }
 
-    public function handle({{model}} $event)
+    public function handle({{model}} $event): void
     {
         // do some crazy stuff...
     }

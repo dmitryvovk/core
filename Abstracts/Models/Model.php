@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Model as LaravelEloquentModel;
 
 abstract class Model extends LaravelEloquentModel
 {
-    use HashIdTrait;
-    use HasResourceKeyTrait;
-    use HasFactory, FactoryLocatorTrait {
+    use FactoryLocatorTrait, HasFactory {
         FactoryLocatorTrait::newFactory insteadof HasFactory;
     }
+    use HashIdTrait;
+    use HasResourceKeyTrait;
 }

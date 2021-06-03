@@ -8,14 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class EventJob extends Job implements ShouldQueue
 {
-    public ShouldHandle $handler;
-
-    public function __construct(ShouldHandle $handler)
+    public function __construct(public ShouldHandle $handler)
     {
-        $this->handler = $handler;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $this->handler->handle();
     }

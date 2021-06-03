@@ -4,6 +4,7 @@ namespace Apiato\Core\Loaders;
 
 use Apiato\Core\Foundation\Facades\Apiato;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -14,11 +15,13 @@ trait ProvidersLoaderTrait
      * All the Service Providers (registered inside the main), will be
      * loaded from the `boot()` function on the parent of the Main
      * Service Providers.
+     *
      * @param $containerPath
      */
     public function loadOnlyMainProvidersFromContainers($containerPath): void
     {
         $containerProvidersDirectory = $containerPath . '/Providers';
+
         $this->loadProviders($containerProvidersDirectory);
     }
 
@@ -31,9 +34,11 @@ trait ProvidersLoaderTrait
 
             foreach ($files as $file) {
                 if (File::isFile($file)) {
+
                     // Check if this is the Main Service Provider
                     if (Str::startsWith($file->getFilename(), $mainServiceProviderNameStartWith)) {
                         $serviceProviderClass = Apiato::getClassFullNameFromFile($file->getPathname());
+
                         $this->loadProvider($serviceProviderClass);
                     }
                 }
@@ -61,6 +66,6 @@ trait ProvidersLoaderTrait
 
     public function loadOnlyShipProviderFromShip(): void
     {
-        $this->loadProvider('App\Ship\Providers\ShipProvider');
+        $this->loadProvider(Config::get('apiato.ship.namespace-ship-provider'));
     }
 }

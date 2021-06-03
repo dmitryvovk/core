@@ -5,18 +5,23 @@ namespace Apiato\Core\Foundation\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array getShipFoldersNames()
- * @method static array getShipPath()
+ * Class Apiato.
+ *
+ * @method static array getShipFoldersNames() Get the port folders names
+ * @method static array getShipPath() Get Ship layer directories paths
  * @method static array getSectionContainerNames(string $sectionName)
- * @method static mixed getClassObjectFromFile($filePathName)
- * @method static string getClassFullNameFromFile($filePathName)
+ * @method static mixed getClassObjectFromFile(string $filePathName) Build and return an object of a class from its file path
+ * @method static string getClassFullNameFromFile(string $filePathName) Get the full name (name \ namespace) of a class from its file path result example: (string) "I\Am\The\Namespace\Of\This\Class"
  * @method static array getSectionPaths()
- * @method static mixed getClassType($className)
+ * @method static string getClassType($className) Get the last part of a camel case string. Example input = helloDearWorld | returns = World
  * @method static array getAllContainerNames()
  * @method static array getAllContainerPaths()
  * @method static array getSectionNames()
  * @method static array getSectionContainerPaths(string $sectionName)
- * @method static void verifyClassExist(string $className)
+ * Check if a word starts with another word
+ * @method static string getLoginWebPageName() WrongConfigurationsException
+ * Return current api prefix, by default '/'
+ * @method static string getApiPrefix()
  *
  * @see \Apiato\Core\Foundation\Apiato
  */

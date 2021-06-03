@@ -9,5 +9,8 @@ use Illuminate\Queue\SerializesModels;
 
 abstract class Job
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 }

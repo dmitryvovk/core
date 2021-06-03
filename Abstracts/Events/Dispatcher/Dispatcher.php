@@ -12,16 +12,17 @@ use Illuminate\Foundation\Bus\PendingDispatch as JobDispatcher;
 
 class Dispatcher extends EventDispatcher
 {
-    public function dispatch($event, $payload = [], $halt = false)
+    public function dispatch($event, $payload = [], $halt = false): ?array
     {
         // Handle event Async when ShouldHandle Interface is implemented
         if ($event instanceof ShouldHandle) {
+
             // Initialize delay & queue variables
             $delay = $event->jobDelay;
             $queue = $event->jobQueue;
 
             // Create a job & initialize the dispatcher
-            $job = new EventJob($event);
+            $job        = new EventJob($event);
             $dispatcher = new JobDispatcher($job);
 
             // Check if the delay is set and if it has the correct type
@@ -37,8 +38,7 @@ class Dispatcher extends EventDispatcher
             if (isset($queue) && is_string($queue)) {
                 $dispatcher->onQueue($queue);
             }
-
-        } else if ($event instanceof ShouldHandleNow) {
+        } elseif ($event instanceof ShouldHandleNow) {
             $event->handle();
         }
 

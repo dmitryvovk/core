@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Tasks;
 
 use App\Containers\{{section-name}}\{{container-name}}\Data\Repositories\{{model}}Repository;
@@ -9,19 +11,15 @@ use Exception;
 
 class Find{{model}}ByIdTask extends Task
 {
-    protected {{model}}Repository $repository;
-
-    public function __construct({{model}}Repository $repository)
+    public function __construct(protected {{model}}Repository $repository)
     {
-        $this->repository = $repository;
     }
 
-    public function run($id)
+    public function run(int $id): ?{{model}}
     {
         try {
             return $this->repository->find($id);
-        }
-        catch (Exception $exception) {
+        } catch (Exception) {
             throw new NotFoundException();
         }
     }

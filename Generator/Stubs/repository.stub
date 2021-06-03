@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\Data\Repositories;
 
 use App\Ship\Parents\Repositories\Repository;
@@ -11,6 +13,5 @@ class {{class-name}} extends Repository
      */
     protected $fieldSearchable = [
         'id' => '=',
-        // ...
     ];
 }

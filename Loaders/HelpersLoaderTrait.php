@@ -13,6 +13,12 @@ trait HelpersLoaderTrait
         $this->loadHelpers($containerHelpersDirectory);
     }
 
+    public function loadHelpersFromShip(): void
+    {
+        $shipHelpersDirectory = base_path('app/Ship/Helpers');
+        $this->loadHelpers($shipHelpersDirectory);
+    }
+
     private function loadHelpers($helpersFolder): void
     {
         if (File::isDirectory($helpersFolder)) {
@@ -20,16 +26,11 @@ trait HelpersLoaderTrait
 
             foreach ($files as $file) {
                 try {
-                    require($file);
-                } catch (FileNotFoundException $e) {
+                    require $file;
+                } catch (FileNotFoundException) {
+                    // idle
                 }
             }
         }
-    }
-
-    public function loadHelpersFromShip(): void
-    {
-        $shipHelpersDirectory = base_path('app/Ship/Helpers');
-        $this->loadHelpers($shipHelpersDirectory);
     }
 }

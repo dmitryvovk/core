@@ -12,45 +12,46 @@ class ServiceProviderGenerator extends GeneratorCommand implements ComponentsGen
     /**
      * User required/optional inputs expected to be passed while calling the command.
      * This is a replacement of the `getArguments` function "which reads whenever it's called".
-     *
-     * @var  array
      */
-    public $inputs = [
+    public array $inputs = [
         ['stub', null, InputOption::VALUE_OPTIONAL, 'The stub file to load for this generator.'],
     ];
+
     /**
      * The console command name.
      *
      * @var string
      */
     protected $name = 'apiato:generate:serviceprovider';
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a ServiceProvider for a Container';
+
     /**
      * The type of class being generated.
      */
     protected string $fileType = 'ServiceProvider';
+
     /**
      * The structure of the file path.
      */
     protected string $pathStructure = '{section-name}/{container-name}/Providers/*';
+
     /**
      * The structure of the file name.
      */
     protected string $nameStructure = '{file-name}';
+
     /**
      * The name of the stub file.
      */
     protected string $stubName = 'providers/mainserviceprovider.stub';
 
-    /**
-     * @return array
-     */
-    public function getUserInputs()
+    public function getUserInputs(): array
     {
         $stub = Str::lower($this->checkParameterOrChoice(
             'stub',
@@ -64,15 +65,15 @@ class ServiceProviderGenerator extends GeneratorCommand implements ComponentsGen
 
         return [
             'path-parameters' => [
-                'section-name' => $this->sectionName,
+                'section-name'   => $this->sectionName,
                 'container-name' => $this->containerName,
             ],
             'stub-parameters' => [
-                '_section-name' => Str::lower($this->sectionName),
-                'section-name' => $this->sectionName,
+                '_section-name'   => Str::lower($this->sectionName),
+                'section-name'    => $this->sectionName,
                 '_container-name' => Str::lower($this->containerName),
-                'container-name' => $this->containerName,
-                'class-name' => $this->fileName,
+                'container-name'  => $this->containerName,
+                'class-name'      => $this->fileName,
             ],
             'file-parameters' => [
                 'file-name' => $this->fileName,
@@ -81,7 +82,7 @@ class ServiceProviderGenerator extends GeneratorCommand implements ComponentsGen
     }
 
     /**
-     * Get the default file name for this component to be generated
+     * Get the default file name for this component to be generated.
      */
     public function getDefaultFileName(): string
     {

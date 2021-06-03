@@ -9,42 +9,26 @@ use Log;
 abstract class Exception extends BaseException
 {
     private const DEFAULT_STATUS_CODE = 500;
+
     protected string $environment;
+
     protected $message;
+
     protected $code;
+
     protected array $errors = [];
 
+    /** @noinspection PhpMissingParentConstructorInspection */
     public function __construct(
         ?string $message = null,
         ?int $code = null,
         ?BaseException $previous = null
-    )
-    {
+    ) {
         // Detect and set the running environment
         $this->environment = Config::get('app.env');
 
         $this->message = $this->prepareMessage($message);
-        $this->code = $this->prepareStatusCode($code);
-    }
-
-    /**
-     * @param string|null $message
-     *
-     * @return string|null
-     */
-    private function prepareMessage(?string $message = null): ?string
-    {
-        return is_null($message) ? $this->message : $message;
-    }
-
-    private function prepareStatusCode(?int $code = null): int
-    {
-        return is_null($code) ? $this->findStatusCode() : $code;
-    }
-
-    private function findStatusCode(): int
-    {
-        return $this->code ?? Self::DEFAULT_STATUS_CODE;
+        $this->code    = $this->prepareStatusCode($code);
     }
 
     /**
@@ -53,29 +37,28 @@ abstract class Exception extends BaseException
      *
      * @param $error
      * @param $force
-     *
-     * @return $this
      */
-    public function debug($error, bool $force = false): Exception
+    public function debug($error, bool $force = false): self
     {
         if ($error instanceof BaseException) {
             $error = $error->getMessage();
         }
 
-        if ($this->environment != 'testing' || $force === true) {
+        if ($this->environment !== 'testing' || $force === true) {
             Log::error('[DEBUG] ' . $error);
         }
 
         return $this;
     }
 
-    public function withErrors(array $errors, bool $override = true): Exception
+    public function withErrors(array $errors, bool $override = true): self
     {
         if ($override) {
             $this->errors = $errors;
         } else {
             $this->errors = array_merge($this->errors, $errors);
         }
+
         return $this;
     }
 
@@ -100,5 +83,20 @@ abstract class Exception extends BaseException
         }
 
         return $translatedErrors;
+    }
+
+    private function prepareMessage(?string $message = null): ?string
+    {
+        return is_null($message) ? $this->message : $message;
+    }
+
+    private function prepareStatusCode(?int $code = null): int
+    {
+        return is_null($code) ? $this->findStatusCode() : $code;
+    }
+
+    private function findStatusCode(): int
+    {
+        return $this->code ?? self::DEFAULT_STATUS_CODE;
     }
 }

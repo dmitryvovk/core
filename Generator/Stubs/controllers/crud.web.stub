@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Containers\{{section-name}}\{{container-name}}\UI\{{user-interface}}\Controllers;
 
 use App\Containers\{{section-name}}\{{container-name}}\UI\{{user-interface}}\Requests\Create{{model}}Request;
@@ -18,44 +20,38 @@ use App\Ship\Parents\Controllers\WebController;
 
 class {{class-name}} extends WebController
 {
-    public function index(GetAll{{models}}Request $request)
+    public function index(GetAll{{models}}Request $request): void
     {
-        ${{entities}} = app(GetAll{{models}}Action::class)->run($request);
+        ${{entities}} = app(GetAll{{models}}Action::class)->run($request->toTransporter());
+    }
+
+    public function show(Find{{model}}ByIdRequest $request): void
+    {
+        ${{entity}} = app(Find{{model}}ByIdAction::class)->run($request->toTransporter());
+    }
+
+    public function create(Create{{model}}Request $request): void
+    {
         // ..
     }
 
-    public function show(Find{{model}}ByIdRequest $request)
+    public function store(Store{{model}}Request $request): void
     {
-        ${{entity}} = app(Find{{model}}ByIdAction::class)->run($request);
-        // ..
+        ${{entity}} = app(Create{{model}}Action::class)->run($request->toTransporter());
     }
 
-    public function create(Create{{model}}Request $request)
+    public function edit(Edit{{model}}Request $request): void
     {
-        // ..
+        ${{entity}} = app(Find{{model}}ByIdAction::class)->run($request->toTransporter());
     }
 
-    public function store(Store{{model}}Request $request)
+    public function update(Update{{model}}Request $request): void
     {
-        ${{entity}} = app(Create{{model}}Action::class)->run($request);
-        // ..
+        ${{entity}} = app(Update{{model}}Action::class)->run($request->toTransporter());
     }
 
-    public function edit(Edit{{model}}Request $request)
+    public function destroy(Delete{{model}}Request $request): void
     {
-        ${{entity}} = app(Find{{model}}ByIdAction::class)->run($request);
-        // ..
-    }
-
-    public function update(Update{{model}}Request $request)
-    {
-        ${{entity}} = app(Update{{model}}Action::class)->run($request);
-        // ..
-    }
-
-    public function destroy(Delete{{model}}Request $request)
-    {
-         $result = app(Delete{{model}}Action::class)->run($request);
-         // ..
+          $result = app(Delete{{model}}Action::class)->run($request->toTransporter());
     }
 }

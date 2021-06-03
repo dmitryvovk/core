@@ -9,7 +9,15 @@ trait MigrationsLoaderTrait
     public function loadMigrationsFromContainers($containerPath): void
     {
         $containerMigrationDirectory = $containerPath . '/Data/Migrations';
+
         $this->loadMigrations($containerMigrationDirectory);
+    }
+
+    public function loadMigrationsFromShip(): void
+    {
+        $portMigrationDirectory = base_path('app/Ship/Migrations');
+
+        $this->loadMigrations($portMigrationDirectory);
     }
 
     private function loadMigrations($directory): void
@@ -17,11 +25,5 @@ trait MigrationsLoaderTrait
         if (File::isDirectory($directory)) {
             $this->loadMigrationsFrom($directory);
         }
-    }
-
-    public function loadMigrationsFromShip(): void
-    {
-        $portMigrationDirectory = base_path('app/Ship/Migrations');
-        $this->loadMigrations($portMigrationDirectory);
     }
 }
